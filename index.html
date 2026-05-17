@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2d3a2e">
+<title>Cottage Closet</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Outfit:wght@300;400;500;600&display=swap');
+
+  :root {
+    --moss: #2d3a2e;
+    --moss-deep: #232d24;
+    --sage: #7d9471;
+    --sage-soft: #a4b89a;
+    --cream: #f4f1e8;
+    --paper: #faf8f1;
+    --bark: #4a4036;
+    --clay: #c17a52;
+    --clay-soft: #d99873;
+    --ink: #2a2620;
+    --muted: #8a8475;
+    --line: #e3ddcd;
+    --short: #b5483b;
+    --shadow: rgba(45,58,46,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    background: var(--paper);
+    font-family: 'Outfit', -apple-system, sans-serif;
+    color: var(--ink);
+    overscroll-behavior-y: contain;
+  }
+
+  body {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+    background-image: radial-gradient(circle at 12% 8%, rgba(125,148,113,0.08), transparent 45%),
+                      radial-gradient(circle at 88% 92%, rgba(193,122,82,0.07), transparent 50%);
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    padding: 22px 22px 16px;
+    background: var(--moss);
+    color: var(--cream);
+    border-radius: 0 0 26px 26px;
+    box-shadow: 0 8px 24px var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+  }
+  .brand h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.7rem;
+    letter-spacing: -0.01em;
+  }
+  .brand .leaf { font-size: 1.3rem; }
+  .tagline {
+    font-size: 0.78rem;
+    color: var(--sage-soft);
+    margin-top: 2px;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+  }
+
+  /* ---------- Stats strip ---------- */
+  .stats {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .stat {
+    flex: 1;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 10px 12px;
+  }
+  .stat .num {
+    font-family: 'Fraunces', serif;
+    font-size: 1.45rem;
+    font-weight: 600;
+  }
+  .stat.alert .num { color: var(--clay-soft); }
+  .stat .lbl {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--sage-soft);
+    margin-top: 1px;
+  }
+
+  /* ---------- Tabs ---------- */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    padding: 14px 18px 4px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 9px 4px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--muted);
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    transition: all 0.18s ease;
+  }
+  .tab.active {
+    background: var(--moss);
+    color: var(--cream);
+    border-color: var(--moss);
+  }
+  .tab.active[data-filter="short"] {
+    background: var(--clay);
+    border-color: var(--clay);
+  }
+  .tab .badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    margin-left: 3px;
+    opacity: 0.75;
+  }
+
+  /* ---------- Search ---------- */
+  .search-wrap { padding: 8px 18px 4px; }
+  .search {
+    width: 100%;
+    padding: 11px 14px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    color: var(--ink);
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+  .search:focus { outline: none; border-color: var(--sage); }
+  .search::placeholder { color: var(--muted); }
+
+  /* ---------- List ---------- */
+  main {
+    padding: 6px 18px 150px;
+  }
+  .group-label {
+    font-family: 'Fraunces', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--bark);
+    margin: 18px 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .group-label .count {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--muted);
+    background: var(--cream);
+    border: 1px solid var(--line);
+    padding: 1px 8px;
+    border-radius: 20px;
+  }
+
+  .card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 12px 13px;
+    margin-bottom: 9px;
+    box-shadow: 0 2px 8px rgba(45,58,46,0.04);
+    animation: rise 0.3s ease backwards;
+  }
+  .card.is-short {
+    border-color: rgba(181,72,59,0.4);
+    background: linear-gradient(180deg, rgba(181,72,59,0.04), var(--paper));
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .icon-chip {
+    width: 42px; height: 42px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 1.2rem;
+    background: var(--cream);
+  }
+
+  .card-body { flex: 1; min-width: 0; }
+  .card-name {
+    font-size: 0.98rem;
+    font-weight: 500;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .card-meta {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .pill {
+    font-size: 0.68rem;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.01em;
+  }
+  .pill.ok { background: rgba(125,148,113,0.18); color: var(--moss); }
+  .pill.short { background: rgba(181,72,59,0.13); color: var(--short); }
+
+  /* ---------- Stepper ---------- */
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 3px;
+  }
+  .step-btn {
+    width: 30px; height: 30px;
+    border-radius: 9px;
+    border: none;
+    background: transparent;
+    font-size: 1.15rem;
+    color: var(--bark);
+    display: grid;
+    place-items: center;
+  }
+  .step-btn:active { background: var(--line); }
+  .have-num {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    min-width: 42px;
+    text-align: center;
+    line-height: 1;
+  }
+  .have-num .of {
+    display: block;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    margin-top: 1px;
+  }
+
+  .card-actions { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+  .act-btn {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--cream);
+    display: grid;
+    place-items: center;
+    font-size: 0.8rem;
+    color: var(--bark);
+  }
+  .act-btn:active { transform: scale(0.9); }
+  .act-btn.del { color: var(--short); }
+
+  /* ---------- Empty state ---------- */
+  .empty {
+    text-align: center;
+    padding: 56px 30px;
+    color: var(--muted);
+  }
+  .empty .big { font-size: 2.6rem; margin-bottom: 12px; }
+  .empty .head {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    color: var(--bark);
+    margin-bottom: 4px;
+  }
+  .empty p { font-size: 0.85rem; line-height: 1.5; }
+
+  /* ---------- Add button ---------- */
+  .fab {
+    position: fixed;
+    right: 20px;
+    bottom: calc(22px + env(safe-area-inset-bottom));
+    height: 56px;
+    padding: 0 24px 0 20px;
+    border-radius: 30px;
+    background: var(--clay);
+    color: #fff;
+    border: none;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 22px rgba(193,122,82,0.42);
+    z-index: 30;
+  }
+  .fab:active { transform: scale(0.94); }
+  .fab .plus { font-size: 1.3rem; line-height: 1; }
+
+  /* ---------- Sheet ---------- */
+  .scrim {
+    position: fixed; inset: 0;
+    background: rgba(35,45,36,0.5);
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 40;
+  }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+
+  .sheet {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    background: var(--paper);
+    border-radius: 24px 24px 0 0;
+    padding: 10px 22px calc(26px + env(safe-area-inset-bottom));
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(.22,1,.36,1);
+    z-index: 50;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+  .sheet.open { transform: translateY(0); }
+  .grabber {
+    width: 38px; height: 4px;
+    background: var(--line);
+    border-radius: 4px;
+    margin: 0 auto 16px;
+  }
+  .sheet h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin-bottom: 4px;
+    color: var(--bark);
+  }
+  .sheet .sub {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .field input {
+    width: 100%;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--ink);
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+  .field input:focus { outline: none; border-color: var(--sage); }
+
+  .chip-row { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    padding: 8px 13px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    color: var(--bark);
+    transition: all 0.15s ease;
+  }
+  .chip.sel {
+    background: var(--moss);
+    color: var(--cream);
+    border-color: var(--moss);
+  }
+
+  .count-grid { display: flex; gap: 12px; }
+  .count-grid .field { flex: 1; }
+  .qty-row { display: flex; align-items: center; gap: 8px; }
+  .qty-btn {
+    width: 42px; height: 44px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--cream);
+    font-size: 1.4rem;
+    color: var(--bark);
+    display: grid;
+    place-items: center;
+  }
+  .qty-btn:active { transform: scale(0.9); }
+  .qty-val {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    flex: 1;
+    text-align: center;
+  }
+
+  .save-btn {
+    width: 100%;
+    margin-top: 6px;
+    padding: 15px;
+    border: none;
+    border-radius: 14px;
+    background: var(--clay);
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .save-btn:active { transform: scale(0.98); }
+
+  /* ---------- Reset link ---------- */
+  .footer-tools {
+    text-align: center;
+    padding: 4px 0 30px;
+  }
+  .reset-link {
+    font-size: 0.74rem;
+    color: var(--muted);
+    text-decoration: underline;
+    background: none;
+    border: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="leaf">🌿</span>
+    <h1>Cottage Closet</h1>
+  </div>
+  <div class="tagline">What you have · what you need · what to bring</div>
+  <div class="stats">
+    <div class="stat">
+      <div class="num" id="statItems">0</div>
+      <div class="lbl">Item Types</div>
+    </div>
+    <div class="stat">
+      <div class="num" id="statStocked">0</div>
+      <div class="lbl">At Par</div>
+    </div>
+    <div class="stat alert">
+      <div class="num" id="statShort">0</div>
+      <div class="lbl">To Bring</div>
+    </div>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-filter="all">All</div>
+  <div class="tab" data-filter="short">To Bring <span class="badge" id="badgeShort"></span></div>
+  <div class="tab" data-filter="ok">At Par <span class="badge" id="badgeOk"></span></div>
+</div>
+
+<div class="search-wrap">
+  <input type="text" class="search" id="search" placeholder="Search items…">
+</div>
+
+<main id="list"></main>
+
+<div class="footer-tools">
+  <button class="reset-link" id="resetBtn">Reset to original par list</button>
+</div>
+
+<button class="fab" id="addBtn"><span class="plus">+</span> Add Item</button>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet">
+  <div class="grabber"></div>
+  <h2 id="sheetTitle">Add an Item</h2>
+  <div class="sub">“Have” is what's at the cottage now. “Want” is your target.</div>
+  <div class="field">
+    <label>Item name</label>
+    <input type="text" id="fName" placeholder="e.g. Wool socks" autocomplete="off">
+  </div>
+  <div class="field">
+    <label>Category</label>
+    <div class="chip-row" id="catRow"></div>
+  </div>
+  <div class="count-grid">
+    <div class="field">
+      <label>Have at cottage</label>
+      <div class="qty-row">
+        <button class="qty-btn" data-step="have" data-dir="-1">−</button>
+        <span class="qty-val" id="haveVal">0</span>
+        <button class="qty-btn" data-step="have" data-dir="1">+</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Want (par)</label>
+      <div class="qty-row">
+        <button class="qty-btn" data-step="want" data-dir="-1">−</button>
+        <span class="qty-val" id="wantVal">1</span>
+        <button class="qty-btn" data-step="want" data-dir="1">+</button>
+      </div>
+    </div>
+  </div>
+  <button class="save-btn" id="saveBtn">Save Item</button>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORE_KEY = "cottageCloset.items.v3";
+  var CATEGORIES = [
+    { id: "tops",    label: "Tops",        icon: "👕" },
+    { id: "under_s", label: "Undershirts", icon: "🎽" },
+    { id: "bottoms", label: "Bottoms",     icon: "👖" },
+    { id: "shorts",  label: "Shorts",      icon: "🩳" },
+    { id: "outer",   label: "Outerwear",   icon: "🧥" },
+    { id: "knits",   label: "Knits",       icon: "🧶" },
+    { id: "under",   label: "Underwear",   icon: "🩲" },
+    { id: "socks",   label: "Socks",       icon: "🧦" },
+    { id: "footwear",label: "Footwear",    icon: "👟" },
+    { id: "sleep",   label: "Sleepwear",   icon: "🛌" },
+    { id: "swim",    label: "Swim",        icon: "🩱" },
+    { id: "access",  label: "Accessories", icon: "🧣" },
+    { id: "other",   label: "Other",       icon: "👗" }
+  ];
+
+  // ---- Seed par list (have starts at 0; set your real counts in the app) ----
+  var SEED = [
+    // Footwear
+    { name: "Dress shoes",       cat: "footwear", want: 1 },
+    { name: "Flip-flops",        cat: "footwear", want: 1 },
+    { name: "Deck shoes",        cat: "footwear", want: 1 },
+    { name: "Running shoes",     cat: "footwear", want: 1 },
+    { name: "Work shoes",        cat: "footwear", want: 1 },
+    // Bottoms
+    { name: "Jeans",             cat: "bottoms",  want: 1 },
+    { name: "Dress pants",       cat: "bottoms",  want: 2 },
+    { name: "Blue pants",        cat: "bottoms",  want: 1 },
+    { name: "Khaki pants",       cat: "bottoms",  want: 1 },
+    // Shorts
+    { name: "Running shorts",    cat: "shorts",   want: 1 },
+    { name: "Athletic shorts",   cat: "shorts",   want: 1 },
+    { name: "Work shorts",       cat: "shorts",   want: 1 },
+    { name: "Nice shorts",       cat: "shorts",   want: 2 },
+    // Swim
+    { name: "Swimsuit",          cat: "swim",     want: 1 },
+    // Accessories
+    { name: "Belt",              cat: "access",   want: 1 },
+    { name: "Hats",              cat: "access",   want: 3 },
+    // Underwear
+    { name: "Underwear",         cat: "under",    want: 4 },
+    // Socks
+    { name: "Dress socks",       cat: "socks",    want: 4 },
+    { name: "Athletic socks",    cat: "socks",    want: 4 },
+    // Undershirts
+    { name: "V-neck white undershirts",   cat: "under_s", want: 3 },
+    { name: "Crewneck white undershirts", cat: "under_s", want: 2 },
+    // Tops
+    { name: "T-shirts",          cat: "tops",     want: 4 },
+    { name: "Sweatshirt",        cat: "tops",     want: 1 },
+    { name: "Hoodie",            cat: "tops",     want: 1 },
+    { name: "Long-sleeve T-shirts", cat: "tops",  want: 2 },
+    { name: "Polos",             cat: "tops",     want: 3 },
+    { name: "Button-up shirts",  cat: "tops",     want: 3 }
+  ];
+
+  function buildSeed() {
+    return SEED.map(function (s, i) {
+      return {
+        id: "seed-" + i,
+        name: s.name,
+        cat: s.cat,
+        have: 0,
+        want: s.want
+      };
+    });
+  }
+
+  var items = [];
+  var activeFilter = "all";
+  var editingId = null;
+  var draft = { cat: "tops", have: 0, want: 1 };
+
+  // ---- storage ----
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (raw === null) {
+        items = buildSeed();          // first launch — load the par list
+        save();
+      } else {
+        items = JSON.parse(raw);
+        if (!Array.isArray(items)) items = buildSeed();
+      }
+    } catch (e) { items = buildSeed(); }
+  }
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(items)); }
+    catch (e) { alert("Could not save — storage may be full."); }
+  }
+
+  function catOf(id) {
+    for (var i = 0; i < CATEGORIES.length; i++)
+      if (CATEGORIES[i].id === id) return CATEGORIES[i];
+    return CATEGORIES[CATEGORIES.length - 1];
+  }
+  function shortBy(it) { return Math.max(0, it.want - it.have); }
+
+  // ---- rendering ----
+  var listEl = document.getElementById("list");
+
+  function render() {
+    var term = document.getElementById("search").value.trim().toLowerCase();
+
+    var visible = items.filter(function (it) {
+      var isShort = shortBy(it) > 0;
+      if (activeFilter === "short" && !isShort) return false;
+      if (activeFilter === "ok" && isShort) return false;
+      if (term && it.name.toLowerCase().indexOf(term) === -1) return false;
+      return true;
+    });
+
+    // stats
+    var shortCount = items.filter(function (i) { return shortBy(i) > 0; }).length;
+    var okCount = items.length - shortCount;
+    document.getElementById("statItems").textContent = items.length;
+    document.getElementById("statStocked").textContent = okCount;
+    document.getElementById("statShort").textContent = shortCount;
+    document.getElementById("badgeShort").textContent = shortCount ? shortCount : "";
+    document.getElementById("badgeOk").textContent = okCount ? okCount : "";
+
+    listEl.innerHTML = "";
+
+    if (!visible.length) {
+      var msg;
+      if (!items.length) {
+        msg = { big: "🧺", head: "Your closet is empty",
+                p: "Tap “Add Item” to set what you have at the cottage and what you want there." };
+      } else if (activeFilter === "short") {
+        msg = { big: "✅", head: "Nothing to bring",
+                p: "Every item is at or above its par count. You're all stocked up." };
+      } else {
+        msg = { big: "🍂", head: "Nothing here",
+                p: "No items match this view. Try another tab or clear the search." };
+      }
+      listEl.innerHTML =
+        '<div class="empty"><div class="big">' + msg.big + '</div>' +
+        '<div class="head">' + msg.head + '</div><p>' + msg.p + '</p></div>';
+      return;
+    }
+
+    // group by category
+    var groups = {};
+    visible.forEach(function (it) {
+      (groups[it.cat] = groups[it.cat] || []).push(it);
+    });
+
+    var delay = 0;
+    CATEGORIES.forEach(function (cat) {
+      var rows = groups[cat.id];
+      if (!rows) return;
+      var label = document.createElement("div");
+      label.className = "group-label";
+      label.innerHTML = cat.icon + " " + cat.label +
+        ' <span class="count">' + rows.length + '</span>';
+      listEl.appendChild(label);
+
+      rows.forEach(function (it) {
+        listEl.appendChild(buildCard(it, delay));
+        delay += 0.025;
+      });
+    });
+  }
+
+  function buildCard(it, delay) {
+    var c = catOf(it.cat);
+    var gap = shortBy(it);
+    var card = document.createElement("div");
+    card.className = "card" + (gap > 0 ? " is-short" : "");
+    card.style.animationDelay = delay + "s";
+
+    var statusPill = gap > 0
+      ? '<span class="pill short">Bring ' + gap + '</span>'
+      : '<span class="pill ok">At par</span>';
+
+    card.innerHTML =
+      '<div class="icon-chip">' + c.icon + '</div>' +
+      '<div class="card-body">' +
+        '<div class="card-name">' + escapeHtml(it.name) + '</div>' +
+        '<div class="card-meta">' + statusPill + '</div>' +
+      '</div>' +
+      '<div class="stepper">' +
+        '<button class="step-btn" data-act="minus">−</button>' +
+        '<span class="have-num">' + it.have +
+          '<span class="of">of ' + it.want + '</span></span>' +
+        '<button class="step-btn" data-act="plus">+</button>' +
+      '</div>' +
+      '<div class="card-actions">' +
+        '<button class="act-btn" data-act="edit" title="Edit">✎</button>' +
+        '<button class="act-btn del" data-act="del" title="Remove">✕</button>' +
+      '</div>';
+
+    card.querySelector('[data-act="minus"]').addEventListener("click", function () {
+      if (it.have > 0) { it.have--; save(); render(); }
+    });
+    card.querySelector('[data-act="plus"]').addEventListener("click", function () {
+      if (it.have < 999) { it.have++; save(); render(); }
+    });
+    card.querySelector('[data-act="edit"]').addEventListener("click", function () {
+      openSheet(it);
+    });
+    card.querySelector('[data-act="del"]').addEventListener("click", function () {
+      if (confirm("Remove “" + it.name + "” from your inventory?")) {
+        items = items.filter(function (x) { return x.id !== it.id; });
+        save(); render();
+      }
+    });
+    return card;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (ch) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch];
+    });
+  }
+
+  // ---- tabs & search ----
+  Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (tab) {
+    tab.addEventListener("click", function () {
+      document.querySelector(".tab.active").classList.remove("active");
+      tab.classList.add("active");
+      activeFilter = tab.getAttribute("data-filter");
+      render();
+    });
+  });
+  document.getElementById("search").addEventListener("input", render);
+
+  // ---- sheet ----
+  var sheet = document.getElementById("sheet");
+  var scrim = document.getElementById("scrim");
+
+  var catRow = document.getElementById("catRow");
+  CATEGORIES.forEach(function (c) {
+    var chip = document.createElement("div");
+    chip.className = "chip";
+    chip.setAttribute("data-cat", c.id);
+    chip.textContent = c.icon + " " + c.label;
+    chip.addEventListener("click", function () {
+      draft.cat = c.id;
+      syncSheet();
+    });
+    catRow.appendChild(chip);
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll(".qty-btn"), function (btn) {
+    btn.addEventListener("click", function () {
+      var which = btn.getAttribute("data-step");
+      var dir = parseInt(btn.getAttribute("data-dir"), 10);
+      if (which === "have") {
+        draft.have = Math.max(0, Math.min(999, draft.have + dir));
+      } else {
+        draft.want = Math.max(1, Math.min(999, draft.want + dir));
+      }
+      syncSheet();
+    });
+  });
+
+  function syncSheet() {
+    Array.prototype.forEach.call(document.querySelectorAll("#catRow .chip"), function (ch) {
+      ch.classList.toggle("sel", ch.getAttribute("data-cat") === draft.cat);
+    });
+    document.getElementById("haveVal").textContent = draft.have;
+    document.getElementById("wantVal").textContent = draft.want;
+  }
+
+  function openSheet(item) {
+    if (item) {
+      editingId = item.id;
+      document.getElementById("sheetTitle").textContent = "Edit Item";
+      document.getElementById("saveBtn").textContent = "Update Item";
+      document.getElementById("fName").value = item.name;
+      draft = { cat: item.cat, have: item.have, want: item.want };
+    } else {
+      editingId = null;
+      document.getElementById("sheetTitle").textContent = "Add an Item";
+      document.getElementById("saveBtn").textContent = "Save Item";
+      document.getElementById("fName").value = "";
+      draft = { cat: "tops", have: 0, want: 1 };
+    }
+    syncSheet();
+    scrim.classList.add("open");
+    sheet.classList.add("open");
+  }
+  function closeSheet() {
+    scrim.classList.remove("open");
+    sheet.classList.remove("open");
+    document.getElementById("fName").blur();
+  }
+
+  document.getElementById("addBtn").addEventListener("click", function () { openSheet(null); });
+  scrim.addEventListener("click", closeSheet);
+
+  document.getElementById("saveBtn").addEventListener("click", function () {
+    var name = document.getElementById("fName").value.trim();
+    if (!name) {
+      document.getElementById("fName").focus();
+      return;
+    }
+    if (editingId) {
+      items.forEach(function (it) {
+        if (it.id === editingId) {
+          it.name = name; it.cat = draft.cat;
+          it.have = draft.have; it.want = draft.want;
+        }
+      });
+    } else {
+      items.unshift({
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        name: name, cat: draft.cat, have: draft.have, want: draft.want
+      });
+    }
+    save();
+    closeSheet();
+    render();
+  });
+
+  // ---- reset ----
+  document.getElementById("resetBtn").addEventListener("click", function () {
+    if (confirm("Reset everything back to the original par list? This erases your current counts.")) {
+      items = buildSeed();
+      save();
+      render();
+    }
+  });
+
+  // ---- init ----
+  load();
+  render();
+})();
+</script>
+</body>
+</html>
